@@ -16,7 +16,7 @@ import re
 import sqlite3
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from urllib.parse import urlencode, urlparse
 
@@ -110,6 +110,35 @@ def db_open(path):
     CREATE INDEX IF NOT EXISTS idx_bids_bidder_time ON bids(bidder, created_at);
     CREATE INDEX IF NOT EXISTS idx_bids_listing_time ON bids(listing_id, created_at);
     """)
+    # Additive migration: safe with the original database and already-collected bids.
+    for sql in (
+        "ALTER TABLE listings ADD COLUMN history_bid_count INTEGER",
+        "ALTER TABLE listings ADD COLUMN history_high_bid_id INTEGER",
+        "ALTER TABLE listings ADD COLUMN history_current_bid REAL",
+        "ALTER TABLE listings ADD COLUMN history_current_bidder TEXT",
+        "ALTER TABLE listings ADD COLUMN last_catalogue_run INTEGER",
+        "ALTER TABLE listings ADD COLUMN final_checked_at TEXT",
+    ):
+        try:
+            db.execute(sql)
+        except sqlite3.OperationalError as exc:
+            if "duplicate column name" not in str(exc).lower():
+                raise
+    db.executescript("""
+    CREATE TABLE IF NOT EXISTS collection_runs (
+        run_id INTEGER PRIMARY KEY AUTOINCREMENT, started_at TEXT NOT NULL,
+        finished_at TEXT, status TEXT, pages_scanned INTEGER DEFAULT 0,
+        catalogue_records INTEGER DEFAULT 0, checked_histories INTEGER DEFAULT 0,
+        new_bids INTEGER DEFAULT 0, error_count INTEGER DEFAULT 0
+    );
+    CREATE TABLE IF NOT EXISTS listing_observations (
+        run_id INTEGER NOT NULL, listing_id INTEGER NOT NULL, seen_at TEXT NOT NULL,
+        current_bid REAL, current_bidder TEXT, is_closed INTEGER,
+        PRIMARY KEY(run_id, listing_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_listing_observations_listing ON listing_observations(listing_id, run_id);
+    """)
+    db.commit()
     return db
 
 
@@ -250,6 +279,216 @@ def cmd_import(a, db):
               f"{file}: {len(rows)} catalogue entries")
 
 
+def _stamp():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _parse_end(value):
+    if not value:
+        return None
+    try:
+        dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        # KOTN catalogue dates are Ontario local time; avoid mistaking them for UTC.
+        if dt.tzinfo is None:
+            from zoneinfo import ZoneInfo
+            dt = dt.replace(tzinfo=ZoneInfo("America/Toronto"))
+        return dt.astimezone(timezone.utc)
+    except (ValueError, ImportError):
+        return None
+
+
+def cmd_sync(a, db):
+    """Refresh catalogue, retrieve only new/changed/stale histories, then export and analyze."""
+    started = _stamp()
+    with db:
+        cur = db.execute("INSERT INTO collection_runs(started_at,status) VALUES (?, 'running')", (started,))
+        run_id = cur.lastrowid
+    fetcher = Fetcher(a.delay)
+    page_count = 0
+    catalogue_count = 0
+    checks = 0
+    new_bids = 0
+    errors = 0
+    try:
+        # A high-bid ordered auction catalogue allows an early exit at the FIRST
+        # zero-bid listing.  Never assume the server honored the sorting request:
+        # validate descending order (including across page boundaries) before
+        # deciding that the remaining listings all have zero bids.
+        previous_bid = float("inf")
+        reached_zero = False
+        sort_mode = None  # True only if the server really supplies bid-desc ordering
+        warned_fallback = False
+        for page in range(1, a.max_pages + 1):
+            path = f"/auctions/{a.auction_id}" if a.auction_id else "/auctions/all"
+            html = fetcher.get(path, {"order_by": "bid_desc", "per_page": 90, "page": page})
+            # The catalogue page marks the active sort option. Some routes may
+            # ignore order_by; do not apply the zero-bid shortcut in that case.
+            soup = BeautifulSoup(html, "html.parser")
+            selected_sorts = [a.get_text(" ", strip=True).lower()
+                              for a in soup.select("a.dropdown-item.active")
+                              if "order_by=" in (a.get("href") or "")]
+            selected_high = any("bid (high to low)" in label for label in selected_sorts)
+            if sort_mode is None:
+                sort_mode = selected_high
+            elif sort_mode and not selected_high:
+                raise RuntimeError("Site stopped honouring bid-desc sorting mid-scan; refusing early cutoff")
+            if not selected_high and not warned_fallback:
+                print("KOTN did not honour bid_desc (selected: %s). "
+                      "Switching to SAFE full-catalogue scan, ignoring $0 listings; "
+                      "cannot stop at the first $0 without losing bids." % selected_sorts,
+                      flush=True)
+                warned_fallback = True
+            rows = parse_catalogue(html)
+            if not rows:
+                if page == 1:
+                    raise RuntimeError("No listingData on first page; check auction ID and page format")
+                print(f"No listings on page {page}; catalogue scan finished.", flush=True)
+                break
+
+            eligible = []
+            for row in rows:
+                bid = float(row.get("current_bid") or 0)
+                if sort_mode and bid > previous_bid:
+                    raise RuntimeError(
+                        f"Catalogue is not in descending bid order at page {page}, "
+                        f"listing {row['id']} ({bid:g} after {previous_bid:g}). "
+                        "Refusing to stop early because this could miss bids."
+                    )
+                previous_bid = bid
+                if bid <= 0:
+                    if sort_mode:
+                        reached_zero = True
+                        break
+                    continue  # Unsorted catalogue: $0 is not the end of positive bids.
+                eligible.append(row)
+
+            # Validate remainder of page even after seeing zero: if sorting has
+            # drifted, refuse early termination rather than silently lose data.
+            if reached_zero:
+                first_zero_index = len(eligible)
+                for row in rows[first_zero_index + 1:]:
+                    if float(row.get("current_bid") or 0) > 0:
+                        raise RuntimeError(
+                            "Positive bid found after zero bid on the same page; "
+                            "site is not reliably sorted bid_desc."
+                        )
+
+            with db:
+                for row in eligible:
+                    upsert_listing(db, row)
+                    db.execute("UPDATE listings SET last_catalogue_run=? WHERE id=?", (run_id, row["id"]))
+                    db.execute("""INSERT OR REPLACE INTO listing_observations
+                        (run_id,listing_id,seen_at,current_bid,current_bidder,is_closed)
+                        VALUES(?,?,?,?,?,?)""", (run_id,row["id"],_stamp(),row["current_bid"],row["current_bidder"],row["is_closed"]))
+            page_count += 1
+            catalogue_count += len(eligible)
+            print(f"Catalog page {page}: {len(eligible)} positive-bid listings", flush=True)
+            if reached_zero:
+                print(f"First $0 bid reached on page {page}; stopping catalogue scan.", flush=True)
+                break
+            if len(rows) < 90:
+                break
+        if page_count == 0:
+            raise RuntimeError("No catalogue pages retrieved; cannot perform incremental sync")
+
+        # Distinguish prior catalogue snapshot from the last successfully checked history.
+        # This avoids skipping bid changes on listings we have already visited.
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=a.stale_hours)
+        selected = []
+        reasons = {}
+        for (id_, current_bid, current_bidder, checked, history_bid, history_bidder,
+             scheduled_end, closed, final_checked) in db.execute("""
+            SELECT id,current_bid,current_bidder,history_checked_at,history_current_bid,
+                   history_current_bidder,scheduled_end,is_closed,final_checked_at
+            FROM listings WHERE last_catalogue_run=? AND COALESCE(current_bid,0)>0
+            ORDER BY id""", (run_id,)):
+            reason = None
+            if checked is None:
+                reason = "new history"
+            elif history_bid is None:
+                reason = "legacy history baseline"
+            elif float(current_bid or 0) != float(history_bid or 0) or (current_bidder or "") != (history_bidder or ""):
+                reason = "bid changed"
+            else:
+                checked_at = datetime.fromisoformat(checked.replace("Z", "+00:00"))
+                if checked_at.tzinfo is None:
+                    checked_at = checked_at.replace(tzinfo=timezone.utc)
+                end = _parse_end(scheduled_end)
+                now = datetime.now(timezone.utc)
+                if end and now >= end and not final_checked:
+                    reason = "final check"
+                elif end and now < end <= now + timedelta(hours=a.closing_hours) and checked_at < cutoff:
+                    reason = "closing soon"
+                elif a.stale_hours > 0 and checked_at < cutoff:
+                    reason = "stale"
+            if reason:
+                selected.append(id_)
+                reasons[id_] = reason
+        if a.limit > 0:
+            selected = selected[:a.limit]
+        print(f"Sync run {run_id}: {catalogue_count} observed listings; {len(selected)} histories to refresh", flush=True)
+
+        worker_local = threading.local()
+        def fetch_one(id_):
+            if not hasattr(worker_local, "fetcher"):
+                worker_local.fetcher = Fetcher(a.delay)
+            row, bids = parse_listing(worker_local.fetcher.get(f"/listings/{id_}"))
+            if not row:
+                raise ValueError("No listing record")
+            return row, bids
+
+        if selected:
+            with ThreadPoolExecutor(max_workers=a.workers) as pool:
+                futures = {pool.submit(fetch_one, id_): id_ for id_ in selected}
+                for index, future in enumerate(as_completed(futures), 1):
+                    id_ = futures[future]
+                    try:
+                        row, bids = future.result()
+                        before = db.total_changes
+                        with db:
+                            upsert_listing(db, row, history=True)
+                            # Track insert count separately from updates, because bid IDs
+                            # are stable and existing records are upserted.
+                            known = set()
+                            if bids:
+                                wanted = [b['bid_id'] for b in bids]
+                                for start in range(0, len(wanted), 800):
+                                    chunk = wanted[start:start+800]
+                                    marks = ','.join('?' for _ in chunk)
+                                    known.update(r[0] for r in db.execute(f'SELECT bid_id FROM bids WHERE bid_id IN ({marks})', chunk))
+                            save_bids(db, bids)
+                            db.execute("""UPDATE listings SET history_bid_count=?, history_high_bid_id=?,
+                                history_current_bid=?, history_current_bidder=?,
+                                final_checked_at=CASE WHEN is_closed=1 THEN ? ELSE final_checked_at END
+                                WHERE id=?""", (len(bids), max((b['bid_id'] for b in bids), default=None),
+                                    row['current_bid'], row['current_bidder'], _stamp(), id_))
+                        added = len(bids) - len(known)
+                        new_bids += added
+                        checks += 1
+                        print(f"[{index}/{len(selected)}] {id_}: +{added} new bids ({len(bids)} total, {reasons[id_]})", flush=True)
+                    except (requests.RequestException, RuntimeError, ValueError, sqlite3.Error) as exc:
+                        errors += 1
+                        LOG.error("Listing %d failed: %s", id_, exc)
+                        if "429" in str(exc) or "403" in str(exc):
+                            for pending in futures:
+                                pending.cancel()
+                            raise RuntimeError("Rate-limited or forbidden; stop collection and reduce workers") from exc
+        with db:
+            db.execute("""UPDATE collection_runs SET finished_at=?, status='complete',pages_scanned=?,
+                catalogue_records=?,checked_histories=?,new_bids=?,error_count=? WHERE run_id=?""",
+                       (_stamp(),page_count,catalogue_count,checks,new_bids,errors,run_id))
+        print(f"SYNC COMPLETE: {checks} histories refreshed; {new_bids} new bids; {errors} errors", flush=True)
+        if not a.no_export:
+            cmd_export(argparse.Namespace(prefix=a.prefix), db)
+            cmd_analyze(a,db)
+    except Exception:
+        with db:
+            db.execute("""UPDATE collection_runs SET finished_at=?,status='failed',pages_scanned=?,
+                catalogue_records=?,checked_histories=?,new_bids=?,error_count=? WHERE run_id=?""",
+                       (_stamp(),page_count,catalogue_count,checks,new_bids,errors+1,run_id))
+        raise
+
+
 def cmd_export(a, db):
     prefix = Path(a.prefix)
     for table in ("listings", "bids"):
@@ -293,7 +532,7 @@ def main():
     scan.add_argument("--pages", type=int, default=2)
     hist = sub.add_parser("histories", help="Collect individual bid histories for scanned listings")
     hist.add_argument("--limit", type=int, default=50)
-    hist.add_argument("--workers", type=int, default=1, choices=range(1, 11), metavar="1-10", help="Concurrent read-only fetches; default 1, maximum 10")
+    hist.add_argument("--workers", type=int, default=1, choices=range(1, 16), metavar="1-15", help="Concurrent read-only fetches; default 1, maximum 15")
     hist.add_argument("--refresh", action="store_true", help="Recheck already collected listings")
     hist.add_argument("--include-zero", action="store_true", help="Also fetch listings whose current bid is $0")
     imp = sub.add_parser("import-html", help="Import saved HTML pages without network access")
@@ -301,13 +540,25 @@ def main():
     exp = sub.add_parser("export", help="Export SQLite data to CSV")
     exp.add_argument("--prefix", default="kotn")
     sub.add_parser("analyze", help="Inspect observed bidder activity")
+    sync = sub.add_parser("sync", help="Incrementally scan, refresh changed histories, export and analyze")
+    sync.add_argument("--max-pages", type=int, default=250, help="Maximum catalogue pages; early $0 stop only if high-bid sorting is confirmed")
+    sync.add_argument("--auction-id", type=int, default=1389, help="Auction ID (default: 1389); set 0 for all auctions")
+    sync.add_argument("--workers", type=int, default=3, choices=range(1,16), metavar="1-15")
+    sync.add_argument("--delay", type=float, default=3)
+    sync.add_argument("--stale-hours", type=float, default=48, help="Revisit unchanged records after N hours; 0 disables")
+    sync.add_argument("--closing-hours", type=float, default=12)
+    sync.add_argument("--within-hours", type=float, default=0, help="Deprecated and ignored: sync now uses highest-bid ordering")
+    sync.add_argument("--final-grace-hours", type=float, default=24, help="Include listings that closed up to N hours ago when using --within-hours")
+    sync.add_argument("--limit", type=int, default=0, help="Max histories this run; 0 = all changed")
+    sync.add_argument("--prefix", default="kotn")
+    sync.add_argument("--no-export", action="store_true")
     for p in (scan, hist):
         p.add_argument("--delay", type=float, default=3, help="Minimum seconds between GET requests (>=2)")
     args = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     with db_open(args.db) as db:
         {"scan":cmd_scan,"histories":cmd_histories,"import-html":cmd_import,
-         "export":cmd_export,"analyze":cmd_analyze}[args.command](args, db)
+         "export":cmd_export,"analyze":cmd_analyze,"sync":cmd_sync}[args.command](args, db)
 
 if __name__ == "__main__":
     try:
