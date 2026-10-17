@@ -1,31 +1,7 @@
-# KOTN Bid Data Research — Multi-page GitHub Pages Site
+# KOTN independent bid-data research
 
-Independent analysis of publicly recorded KOTN auction bid records. Not affiliated with the auction operator.
+Dark-theme multi-page research dossier, release 3.0. Start at [index.html](index.html). Live GitHub Pages URL: https://kotnanalysis-png.github.io/kotn-data-analysis/
 
-## Live site
+Bid statistics through October 16, 2026 (midnight cutoff starting October 17, Toronto time). The October 17 catalogue state is retained separately for provisional leading-bid values and must not be interpreted as spending. Bidder usernames are public pseudonyms and high-frequency participation does not prove automation or wrongdoing.
 
-https://kotnanalysis-png.github.io/kotn-data-analysis/
-
-## Site contents
-
-- Overview (`index.html`)
-- Daily activity (`activity.html`)
-- Bidder profiles (`bidders.html`)
-- Inferred category concentrations (`categories.html`)
-- Bidding timing and patterns (`patterns.html`)
-- Data quality and outcomes (`quality.html`)
-- Methodology and downloads (`methodology.html`)
-
-## Analysis cutoff
-
-The October 17 run excludes all bids made on October 17. It includes 28,026 bids through October 16, 23:59:45 (source timestamps interpreted as Toronto local time). October 13 is a partial first observed date. Source catalogue state was captured October 17; it is not a reconstructed historical October 16 financial state. No verified closed outcomes available.
-
-## Deployment
-
-Upload the contents of this archive into the **root** of `kotnanalysis-png/kotn-data-analysis` on branch `main`, preserving the `assets/` and `data/` folders. Keep `index.html` at repository root. The website uses only local CSS/JS and works on GitHub Pages. It also opens offline by opening index.html, with no external APIs required.
-
-Do not upload authenticated page HTML, cookies, secrets, browser profiles, or local database files.
-
-## Caution
-
-High-frequency bidding is not proof of bots, dishonest behaviour, or wrongdoing.
+See [Evidence & methods](methodology.html), [Financial](financial.html), [Competition](competition.html), [Auction comparisons](auctions.html), and [Release notes](RELEASE_NOTES.md).
