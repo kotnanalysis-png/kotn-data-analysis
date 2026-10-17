@@ -1,3 +1,9 @@
+# Release notes
+
+## v3.2
+- Added the Reddit profile screenshot directly to the Community Discussion page.
+- Preserved dark theme and all existing research sections.
+
 # Research site release 3.0
 
 Preserves the original dark theme and existing dashboard pages. Adds Financial, Listing sequences, Competitive bidding, Auction comparisons, Pickup operations and Research archive pages. All bid analytics exclude October 17 records; Oct 17 catalogue states are explicitly separate from that cutoff. No verified closed auctions.
