@@ -1,88 +1,101 @@
 bidder,category,bids,category_all_bids,category_share_pct
-akshar9,Electronics & computing,1,3087,0.03
-akshar9,Furniture & decor,3,2539,0.12
-akshar9,Household & cleaning,3,2628,0.11
-akshar9,Other / unclassified,10,10628,0.09
-akshar9,Sports outdoors & pets,13,1757,0.74
-akshar9,Toys books & hobbies,10,981,1.02
-bhayman,Baby & children,7,2109,0.33
-bhayman,Furniture & decor,2,2539,0.08
-bhayman,Other / unclassified,11,10628,0.1
-chanelbby,Clothing & accessories,3,1877,0.16
-chanelbby,Electronics & computing,2,3087,0.06
-chanelbby,Furniture & decor,5,2539,0.2
-chanelbby,Health & beauty,7,468,1.5
-chanelbby,Household & cleaning,27,2628,1.03
-chanelbby,Kitchen & appliances,3,1066,0.28
-chanelbby,Other / unclassified,68,10628,0.64
-chanelbby,Seasonal,2,333,0.6
-chanelbby,Sports outdoors & pets,3,1757,0.17
-chanelbby,Tools & automotive,1,553,0.18
-chanelbby,Toys books & hobbies,1,981,0.1
-chikit1616,Baby & children,7,2109,0.33
-chikit1616,Clothing & accessories,8,1877,0.43
-chikit1616,Electronics & computing,151,3087,4.89
-chikit1616,Furniture & decor,48,2539,1.89
-chikit1616,Health & beauty,12,468,2.56
-chikit1616,Household & cleaning,32,2628,1.22
-chikit1616,Kitchen & appliances,30,1066,2.81
-chikit1616,Other / unclassified,160,10628,1.51
-chikit1616,Seasonal,2,333,0.6
-chikit1616,Sports outdoors & pets,13,1757,0.74
-chikit1616,Tools & automotive,6,553,1.08
-dantep,Clothing & accessories,1,1877,0.05
-dantep,Electronics & computing,12,3087,0.39
-dantep,Furniture & decor,2,2539,0.08
-dantep,Other / unclassified,13,10628,0.12
-dantep,Sports outdoors & pets,18,1757,1.02
-joepro,Baby & children,16,2109,0.76
-joepro,Clothing & accessories,2,1877,0.11
-joepro,Electronics & computing,5,3087,0.16
-joepro,Furniture & decor,11,2539,0.43
-joepro,Household & cleaning,1,2628,0.04
-joepro,Other / unclassified,37,10628,0.35
-joepro,Sports outdoors & pets,2,1757,0.11
-joepro,Toys books & hobbies,10,981,1.02
-nextbid,Baby & children,61,2109,2.89
-nextbid,Electronics & computing,3,3087,0.1
-nextbid,Household & cleaning,1,2628,0.04
-nextbid,Other / unclassified,17,10628,0.16
-rdookie,Baby & children,1,2109,0.05
-rdookie,Furniture & decor,9,2539,0.35
-rdookie,Health & beauty,1,468,0.21
-rdookie,Household & cleaning,9,2628,0.34
-rdookie,Kitchen & appliances,1,1066,0.09
-rdookie,Other / unclassified,8,10628,0.08
-tetiana1,Baby & children,2,2109,0.09
-tetiana1,Clothing & accessories,4,1877,0.21
-tetiana1,Electronics & computing,18,3087,0.58
-tetiana1,Furniture & decor,22,2539,0.87
-tetiana1,Health & beauty,7,468,1.5
-tetiana1,Household & cleaning,3,2628,0.11
-tetiana1,Kitchen & appliances,27,1066,2.53
-tetiana1,Other / unclassified,56,10628,0.53
-tetiana1,Sports outdoors & pets,21,1757,1.2
-tetiana1,Tools & automotive,2,553,0.36
-tinka,Baby & children,144,2109,6.83
-tinka,Clothing & accessories,23,1877,1.23
-tinka,Electronics & computing,37,3087,1.2
-tinka,Furniture & decor,20,2539,0.79
-tinka,Health & beauty,5,468,1.07
-tinka,Household & cleaning,56,2628,2.13
-tinka,Kitchen & appliances,14,1066,1.31
-tinka,Other / unclassified,261,10628,2.46
-tinka,Seasonal,2,333,0.6
-tinka,Sports outdoors & pets,47,1757,2.68
-tinka,Tools & automotive,7,553,1.27
-tinka,Toys books & hobbies,16,981,1.63
-whitneyhaz,Baby & children,27,2109,1.28
-whitneyhaz,Clothing & accessories,69,1877,3.68
-whitneyhaz,Electronics & computing,37,3087,1.2
-whitneyhaz,Furniture & decor,19,2539,0.75
-whitneyhaz,Health & beauty,2,468,0.43
-whitneyhaz,Household & cleaning,21,2628,0.8
-whitneyhaz,Kitchen & appliances,3,1066,0.28
-whitneyhaz,Other / unclassified,99,10628,0.93
-whitneyhaz,Seasonal,3,333,0.9
-whitneyhaz,Sports outdoors & pets,63,1757,3.59
-whitneyhaz,Toys books & hobbies,50,981,5.1
+akshar9,Baby & children,1,3846,0.03
+akshar9,Electronics & computing,1,3869,0.03
+akshar9,Furniture & decor,5,3599,0.14
+akshar9,Other / unclassified,10,18761,0.05
+akshar9,"Sports, outdoor & pets",13,2738,0.47
+akshar9,"Toys, books & hobbies",10,1906,0.52
+bhayman,Baby & children,7,3846,0.18
+bhayman,Furniture & decor,5,3599,0.14
+bhayman,Other / unclassified,11,18761,0.06
+chanelbby,Clothing & accessories,3,2872,0.1
+chanelbby,Electronics & computing,1,3869,0.03
+chanelbby,Furniture & decor,5,3599,0.14
+chanelbby,Health & beauty,3,702,0.43
+chanelbby,Household & cleaning,4,1571,0.25
+chanelbby,Kitchen & appliances,3,868,0.35
+chanelbby,Other / unclassified,94,18761,0.5
+chanelbby,Seasonal,2,692,0.29
+chanelbby,"Sports, outdoor & pets",3,2738,0.11
+chanelbby,Tools & automotive,3,1158,0.26
+chanelbby,"Toys, books & hobbies",1,1906,0.05
+chetandeep,Electronics & computing,4,3869,0.1
+chetandeep,Furniture & decor,11,3599,0.31
+chetandeep,Health & beauty,3,702,0.43
+chetandeep,Household & cleaning,10,1571,0.64
+chetandeep,Kitchen & appliances,2,868,0.23
+chetandeep,Other / unclassified,49,18761,0.26
+chetandeep,Tools & automotive,2,1158,0.17
+chikit1616,Baby & children,10,3846,0.26
+chikit1616,Clothing & accessories,13,2872,0.45
+chikit1616,Electronics & computing,155,3869,4.01
+chikit1616,Furniture & decor,59,3599,1.64
+chikit1616,Health & beauty,16,702,2.28
+chikit1616,Household & cleaning,6,1571,0.38
+chikit1616,Kitchen & appliances,24,868,2.76
+chikit1616,Other / unclassified,313,18761,1.67
+chikit1616,Seasonal,2,692,0.29
+chikit1616,"Sports, outdoor & pets",12,2738,0.44
+chikit1616,Tools & automotive,11,1158,0.95
+chikit1616,"Toys, books & hobbies",8,1906,0.42
+dantep,Clothing & accessories,1,2872,0.03
+dantep,Electronics & computing,11,3869,0.28
+dantep,Furniture & decor,1,3599,0.03
+dantep,Other / unclassified,14,18761,0.07
+dantep,"Sports, outdoor & pets",19,2738,0.69
+joepro,Baby & children,17,3846,0.44
+joepro,Clothing & accessories,1,2872,0.03
+joepro,Electronics & computing,5,3869,0.13
+joepro,Furniture & decor,12,3599,0.33
+joepro,Household & cleaning,1,1571,0.06
+joepro,Kitchen & appliances,2,868,0.23
+joepro,Other / unclassified,34,18761,0.18
+joepro,"Toys, books & hobbies",12,1906,0.63
+nextbid,Baby & children,85,3846,2.21
+nextbid,Electronics & computing,4,3869,0.1
+nextbid,Furniture & decor,1,3599,0.03
+nextbid,Other / unclassified,17,18761,0.09
+rdookie,Baby & children,1,3846,0.03
+rdookie,Furniture & decor,17,3599,0.47
+rdookie,Health & beauty,1,702,0.14
+rdookie,Household & cleaning,1,1571,0.06
+rdookie,Other / unclassified,11,18761,0.06
+rdookie,Tools & automotive,1,1158,0.09
+rdookie,"Toys, books & hobbies",1,1906,0.05
+tetiana1,Baby & children,5,3846,0.13
+tetiana1,Clothing & accessories,16,2872,0.56
+tetiana1,Electronics & computing,15,3869,0.39
+tetiana1,Furniture & decor,29,3599,0.81
+tetiana1,Health & beauty,10,702,1.42
+tetiana1,Household & cleaning,7,1571,0.45
+tetiana1,Kitchen & appliances,28,868,3.23
+tetiana1,Other / unclassified,80,18761,0.43
+tetiana1,"Sports, outdoor & pets",20,2738,0.73
+tetiana1,Tools & automotive,2,1158,0.17
+tetiana1,"Toys, books & hobbies",1,1906,0.05
+tinka,Baby & children,200,3846,5.2
+tinka,Clothing & accessories,23,2872,0.8
+tinka,Electronics & computing,43,3869,1.11
+tinka,Furniture & decor,21,3599,0.58
+tinka,Health & beauty,6,702,0.85
+tinka,Household & cleaning,31,1571,1.97
+tinka,Kitchen & appliances,8,868,0.92
+tinka,Other / unclassified,359,18761,1.91
+tinka,Seasonal,2,692,0.29
+tinka,"Sports, outdoor & pets",75,2738,2.74
+tinka,Tools & automotive,8,1158,0.69
+tinka,"Toys, books & hobbies",24,1906,1.26
+whitneyhaz,Baby & children,51,3846,1.33
+whitneyhaz,Clothing & accessories,75,2872,2.61
+whitneyhaz,Electronics & computing,31,3869,0.8
+whitneyhaz,Furniture & decor,13,3599,0.36
+whitneyhaz,Health & beauty,2,702,0.28
+whitneyhaz,Household & cleaning,27,1571,1.72
+whitneyhaz,Kitchen & appliances,2,868,0.23
+whitneyhaz,Other / unclassified,206,18761,1.1
+whitneyhaz,Seasonal,3,692,0.43
+whitneyhaz,"Sports, outdoor & pets",64,2738,2.34
+whitneyhaz,"Toys, books & hobbies",67,1906,3.52
+yusef,Baby & children,13,3846,0.34
+yusef,Other / unclassified,3,18761,0.02
+yusef,Tools & automotive,1,1158,0.09

@@ -1,3 +1,14 @@
+## v3.3 Light Theme Correction
+Restored the requested light theme. Only assets/site.css has been changed compared with v3.3; all analysis, data, HTML, navigation and screenshots remain unchanged.
+
+# v3.3 — 2026-10-19
+
+- Updated analysis with October 19 exports (bid cutoff at October 19 midnight, Toronto).
+- Preserved dark theme and all 14 site pages including Reddit screenshot.
+- Refreshed bid tables, daily charts, account metrics, categories, auction windows, three-second sequences, and coverage checks.
+- Financial positions are not treated as verified wins.
+- Earlier archival files retained.
+
 # Release notes
 
 ## v3.2
