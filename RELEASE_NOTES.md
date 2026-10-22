@@ -1,9 +1,8 @@
-# v3.4 — October 21 data refresh
+KOTN Research v3.5, 2026-10-22
 
-- Preserves light theme and 14-page research site, adds `rounds.html`.
-- New October 21 CSV export, exclude 854 October 21 bids.
-- Compares two listing cohorts by scheduled auction ending date.
-- Adds cross-listing ≤1s, ≤3s, repeat accounts, and sustained streak evidence with downloadable CSVs.
-- Refreshes dashboard data, bidder metrics, daily counts, inferred category estimates and quality metrics.
-- Does not infer final winners from ended listings.
-- Historical Oct 17 original snapshots and earlier artifact exports retained.
+- All HTML pages annotated with new export update.
+- Completed-day window through 2026-10-21; new raw bids 58,458, included 57,749.
+- New chikit1616 individual evidence page and downloadable records.
+- Recomputed bidder timing, daily metrics, and two-round comparison.
+- Historical category, finance, competition and other previously computed datasets are retained as archival unless otherwise stated.
+- Light stylesheet preserved. Public account pseudonyms only.
