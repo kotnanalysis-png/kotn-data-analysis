@@ -1,0 +1,17 @@
+page,baseline_tables,preserved_tables,baseline_data_links,missing_baseline_data_links,archived_text_chars,current_tables
+activity.html,1,1,1,0,2053,1
+auctions.html,2,2,1,0,2048,1
+bidders.html,3,3,2,0,2564,1
+categories.html,3,3,1,0,1859,1
+chikit1616.html,4,4,2,0,6510,2
+community.html,1,1,0,0,3224,1
+competition.html,3,3,0,0,2485,1
+financial.html,2,2,0,0,3396,1
+history.html,2,2,4,0,2453,1
+index.html,2,2,2,0,4035,2
+methodology.html,0,0,10,0,4250,1
+operations.html,1,1,0,0,2744,1
+patterns.html,2,2,1,0,1935,2
+quality.html,0,0,0,0,2509,1
+rounds.html,5,5,5,0,3200,1
+sequences.html,2,2,1,0,5854,1

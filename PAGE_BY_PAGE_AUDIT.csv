@@ -1,0 +1,17 @@
+page,nov2_sections_preserved,empty_legacy_containers_removed,current_sections,status,problems,text_chars,tables
+activity.html,3,2,2,PASS,,3993,2
+auctions.html,3,0,2,PASS,,3206,3
+bidders.html,3,0,2,PASS,,5025,4
+categories.html,3,2,2,PASS,,2952,4
+chikit1616.html,4,0,3,PASS,,9179,6
+community.html,3,0,2,PASS,,4566,2
+competition.html,4,0,2,PASS,,4903,4
+financial.html,4,0,3,PASS,,5242,3
+history.html,3,0,2,PASS,,3452,3
+index.html,5,1,4,PASS,,6337,4
+methodology.html,4,0,3,PASS,,6245,1
+operations.html,3,0,2,PASS,,4173,2
+patterns.html,4,0,3,PASS,,3937,4
+quality.html,3,0,2,PASS,,3656,1
+rounds.html,4,0,3,PASS,,4451,6
+sequences.html,3,0,2,PASS,,9045,3
